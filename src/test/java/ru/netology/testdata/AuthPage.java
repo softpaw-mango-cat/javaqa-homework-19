@@ -12,11 +12,21 @@ public class AuthPage {
     private SelenideElement passwordSubField = $("[data-test-id=password].input .input__sub");
     private SelenideElement continueButton = $("[data-test-id=action-login]");
     private SelenideElement errorNotification = $("[data-test-id=error-notification]");
+    private SelenideElement pageHeading = $("h2.heading");
 
     public void login(String login, String password) {
         loginField.setValue(login);
         passwordField.setValue(password);
         continueButton.click();
+    }
+
+    public void shouldNotBeOnDashboard() {
+        pageHeading.shouldNotHave(Condition.text("Личный кабинет"));
+    }
+
+    public void shouldBeOnDashboard() {
+        pageHeading.shouldHave(Condition.text("Личный кабинет"))
+                .shouldBe(Condition.visible);
     }
 
     public void shouldDisplayPageError(String errorText) {

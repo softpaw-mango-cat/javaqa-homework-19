@@ -1,38 +1,15 @@
 package ru.netology.appbank;
 
-import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.Selenide;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.netology.testdata.AuthData;
 import ru.netology.testdata.AuthPage;
 
-import java.io.IOException;
-
-import static com.codeborne.selenide.Selenide.$;
-
 public class AuthTestUI {
 
     private AuthPage page = new AuthPage();
-    private static Process server;
-
-    /* настройки для локального запуска - для CI отключаем
-    @BeforeAll
-    public static void setup() throws IOException, InterruptedException {
-        System.setProperty("selenide.holdBrowserOpen", "true");
-        System.setProperty("selenide.browser", "chrome");
-        System.setProperty("selenide.headless", "false");
-        // запускаем сервер в тестовом режиме, чтоб не запускать вручную через консоль
-        ProcessBuilder pb = new ProcessBuilder(
-                "java", "-jar", "artifacts/app-ibank.jar",
-                "-P:profile=test"
-        );
-        server = pb.start();
-        // ожидание пока запустится
-        Thread.sleep(10000);
-    } */
 
     @BeforeEach
     public void open() {
@@ -47,8 +24,7 @@ public class AuthTestUI {
         AuthData.registerUser(user); // отправляем пост-запрос на сервер
         page.login(user.getLogin(), user.getPassword()); // заполняем поля формы
         // ассертим
-        $("h2.heading")
-                .shouldHave(Condition.text("Личный кабинет"));
+        page.shouldBeOnDashboard();
     }
 
     // не логинится со статусом blocked
@@ -60,7 +36,7 @@ public class AuthTestUI {
         page.login(user.getLogin(), user.getPassword()); // заполняем поля формы
         // ассертим
         page.shouldDisplayPageError("Ошибка! Пользователь заблокирован");
-        $("h2.heading").shouldNotHave(Condition.text("Личный кабинет"));
+        page.shouldNotBeOnDashboard();
     }
 
     // не логинит несуществующего
@@ -71,7 +47,7 @@ public class AuthTestUI {
         // не регистрируем
         page.login(user.getLogin(), user.getPassword()); // заполняем поля формы
         page.shouldDisplayPageError("Ошибка! Неверно указан логин или пароль");
-        $("h2.heading").shouldNotHave(Condition.text("Личный кабинет"));
+        page.shouldNotBeOnDashboard();
     }
 
     // не логинит неверный пароль и логин
@@ -83,7 +59,7 @@ public class AuthTestUI {
         String wrongPassword = AuthData.generatePassword();
         page.login(user.getLogin(), wrongPassword); // заполняем поля формы
         page.shouldDisplayPageError("Ошибка! Неверно указан логин или пароль");
-        $("h2.heading").shouldNotHave(Condition.text("Личный кабинет"));
+        page.shouldNotBeOnDashboard();
     }
 
     @Test
@@ -94,7 +70,7 @@ public class AuthTestUI {
         String wrongLogin = AuthData.generateLogin();
         page.login(wrongLogin, user.getPassword()); // заполняем поля формы
         page.shouldDisplayPageError("Ошибка! Неверно указан логин или пароль");
-        $("h2.heading").shouldNotHave(Condition.text("Личный кабинет"));
+        page.shouldNotBeOnDashboard();
     }
 
     // пустые поля - логин, пароль или оба
@@ -105,7 +81,7 @@ public class AuthTestUI {
         AuthData.registerUser(user);
         page.login("", user.getPassword()); // заполняем поля формы
         page.shouldDisplayLoginError("Поле обязательно для заполнения");
-        $("h2.heading").shouldNotHave(Condition.text("Личный кабинет"));
+        page.shouldNotBeOnDashboard();
     }
 
     @Test
@@ -115,7 +91,7 @@ public class AuthTestUI {
         AuthData.registerUser(user);
         page.login(user.getLogin(), ""); // заполняем поля формы
         page.shouldDisplayPasswordError("Поле обязательно для заполнения");
-        $("h2.heading").shouldNotHave(Condition.text("Личный кабинет"));
+        page.shouldNotBeOnDashboard();
     }
 
     @Test
@@ -126,6 +102,6 @@ public class AuthTestUI {
         page.login("", ""); // заполняем поля формы
         page.shouldDisplayLoginError("Поле обязательно для заполнения");
         page.shouldDisplayPasswordError("Поле обязательно для заполнения");
-        $("h2.heading").shouldNotHave(Condition.text("Личный кабинет"));
+        page.shouldNotBeOnDashboard();
     }
 }

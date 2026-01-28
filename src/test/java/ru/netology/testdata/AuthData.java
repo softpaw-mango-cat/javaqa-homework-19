@@ -5,15 +5,12 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
 import java.util.Locale;
 
 import static io.restassured.RestAssured.given;
 
-@NoArgsConstructor
 public class AuthData {
     private static final Faker FAKER_EN = new Faker(new Locale("en"));
     private static RequestSpecification requestSpec = new RequestSpecBuilder()
@@ -48,9 +45,7 @@ public class AuthData {
                 .statusCode(200);
     }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
+    @Value
     public static class UserData {
         String login;
         String password;
